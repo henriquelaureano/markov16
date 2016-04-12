@@ -1,0 +1,510 @@
+\documentclass[12pt]{article}
+\usepackage[brazilian, brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[top = 2.5cm, left = 2.5cm, right = 2.5cm, bottom = 2.5cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+\usepackage{breqn}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\setlength\parindent{0pt}
+\newcommand{\eqnb}{\begin{equation}}
+\newcommand{\eqne}{\end{equation}}
+\newcommand{\eqnbs}{\begin{equation*}}
+\newcommand{\eqnes}{\end{equation*}}
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+
+\title{  
+ \normalfont \normalsize 
+ \textsc{ce064 - Modelos Markovianos \\
+         (Tópicos Especiais em Estatística IV)} \\
+ Departamento de Estatística \\
+ Universidade Federal do Paraná \\ [25pt]
+ \horrule{.5pt} \\ [.4cm]
+ \huge Lista No.1 \\
+ \horrule{2pt} \\[ .5cm]}
+ 
+\author{Henrique Aparecido Laureano \\ \normalsize{GRR: 20115307}}
+\date{\normalsize Março de 2016}
+
+\begin{document}
+
+\maketitle
+
+\vspace{\fill}
+
+\tableofcontents
+
+\horrule{1pt} \\
+
+\newpage
+
+<<setup, include=FALSE>>=
+library(knitr)
+tema <- knit_theme$get("acid")
+knit_theme$set(tema)
+opts_chunk$set(size='small', cache=TRUE, cache.path='cache/'
+               , comment=NA, warning=FALSE, message=FALSE
+               , fig.align='center', fig.width=8, fig.height=4.5, dpi=100
+               , fig.path='graphs/', fig.pos='H', background='#ffffff')
+@
+
+\section*{Exercício 1 [7, pg 53]}
+\addcontentsline{toc}{section}{Exercício 1}
+
+\horrule{1pt} \\
+
+\textbf{Uma urna contém inicialmente cinco bolas pretas e cinco bolas brancas.
+        A seguinte experiência é repetida indefinidamente: Uma bola é retirada
+        da urna; se a bola for branca, ela é colocada de volta na urna, caso
+        contrário ela é deixada de fora. Considere \( X_{n} \) o número de
+        bolas restantes na urna após a \( n \)-ésima retirada da urna.} \\
+
+\textbf{a) É \{\( X_{n} \)\} um processo de Markov? Se assim for, encontrar as
+           probabilidades de transição adequadas e faça o grafo
+           correspondente.} \\
+
+\{\( X_{n} \)\} é um processo de Markov? Sim. Por quê? \\
+
+De maneira informal podemos dizer que um processo estocástico é uma sequência
+de variáveis aleatórias que evoluem de alguma maneira no tempo. \\
+
+Um processo estocástico é um processo de Markov quando ele satisfaz a
+propriedade de Markov. \\
+
+A propriedade de Markov é definida pela exigência de que
+
+\[ P(X_{n+1} = x_{n+1} | X_{0} = x_{0}, \cdots, X_{n} = x_{n}) = P(X_{n+1} = x_{n+1} | X_{n} = x_{n}), \]
+\vspace{-.25cm}
+
+ou seja, dado o estado atual, os estados passados não tem influência sobre o
+futuro. \\
+
+Tá, mas por que \{\( X_{n} \)\} satisfaz a propriedade de Markov? \\
+
+\textit{Vamos elaborar um cenário:} \\
+
+Primeiro algumas definições: \\
+
+A retirada \( n+1 \) é a 4a retirada e \( x_{n+1} = 8\). \\
+
+Na primeira retirada temos uma bola branca, logo, ela volta pra urna. Na 
+segunda retirada temos uma bola preta, que saí da urna, e na terceira outra
+bola branca, que volta pra urna. \\
+
+O que temos pode ser representado por
+\( P(X_{4} = 8 | X_{0} = 10, X_{1} = 10, X_{2} = 9, X_{3} = 9) \). \\
+
+Então, se
+
+\[ P(X_{4} = 8 | X_{0} = 10, X_{1} = 10, X_{2} = 9, X_{3} = 9) = P(X_{4} = 8 | X_{3} = 9), \]
+\vspace{-.25cm}
+
+\{\( X_{n} \)\} é um processo de Markov.
+
+Dada as definições da experiência, se a urna tem 9 bolas
+(4 pretas e 5 brancas), a probabilidade dela ficar com 8 bolas é de 4/9. \\
+
+Logo, 
+
+\[ P(X_{4} = 8 | X_{0} = 10, X_{1} = 10, X_{2} = 9, X_{3} = 9) = \frac{4}{9} = P(X_{4} = 8 | X_{3} = 9) \]
+\vspace{-.25cm}
+
+e \{\( X_{n} \)\} é um processo de Markov. \\
+
+Quais as probabilidades de transição? \\
+
+Para facilitar a visualização, é apresentada a matriz de probalidades de
+transição \( P \)
+
+\[ P = \bordermatrix{~ & 0 & 1 & 2 & \cdots & d \cr
+                     0 & p_{0,0} & p_{0,1} & p_{0,2} & \cdots & p_{0,d} \cr
+                     1 & p_{1,0} & p_{1,1} & p_{1,2} & \cdots & p_{1,d} \cr
+                     2 & p_{2,0} & p_{2,1} & p_{2,2} & \cdots & p_{2,d} \cr
+                     \vdots & \vdots & \vdots & \vdots & & \vdots \cr
+                     d & p_{d,0} & p_{d,1} & p_{d,2} & \cdots & p_{d,d} \cr} \]
+\vspace{.25cm}
+
+em que \( S = \{0, 1, 2, \cdots, d\} \) é o espaço de estados, e
+\( p_{0,0} \), por exemplo, é a probabilidade de ir do estado 0 pro estado 0
+em um passo, i.e., num instante de tempo, nesse caso a retirada de uma bola da
+urna. \\
+
+Na experiência aqui estudada o espaço de estados é dado por
+\( S = \{10, 9, 8, 7, 6, 5\} \), i.e., os possíveis números de bolas restantes
+na urna. Como as bolas brancas são sempre recolocadas, o mínimo possível é 5.
+\\
+
+A matriz de probabilidades de transição é dada por
+
+\[ P = \bordermatrix{~ & 10 & 9 & 8 & 7 & 6 & 5 \cr
+                     10 & 5/10 & 5/10 & 0 & 0 & 0 & 0 \cr
+                     9 & 0 & 5/9 & 4/9 & 0 & 0 & 0 \cr
+                     8 & 0 & 0 & 5/8 & 3/8 & 0 & 0 \cr
+                     7 & 0 & 0 & 0 & 5/7 & 2/7 & 0 \cr
+                     6 & 0 & 0 & 0 & 0 & 5/6 & 1/6 \cr
+                     5 & 0 & 0 & 0 & 0 & 0 & 1 \cr}. \]
+\vspace{.25cm}
+
+Começamos com 10 bolas na urna e temos probabilidade 1/2 de permanecer com 10,
+já que temos 5 bolas brancas. A probabilidade de ficar com 9 também é 1/2, já
+que as outras cinco bolas são pretas. \\
+
+Essa mesma ideia é aplicada para os demais estados, i.e., para os demais 
+números de bolas na urna.
+
+O grafo correspodente é apresentado abaixo.
+
+\vspace{.75cm}
+\includegraphics[width=\textwidth]{grafo_1.png}
+\vspace{-.2cm}
+
+Nas flechas temos as probabilidades de transição. \\
+
+\textbf{b) Será que as probabilidades de transição dependem de \( n \)?} \\
+
+As probabilidades já mostradas são em um passo, i.e., em uma retirada da urna.
+\\
+
+Quando o número de retiradas da urna, \( n \), aumenta, as probabilidades de
+transição podem ser alteradas. \\
+
+Um dado \textbf{Teorema} em processos de Markov diz que para cada
+\( n = 1, 2, \cdots \), a \( n \)-ésima potência \( P^{n} \) da matriz de
+probabilidades de transição \( P \) tem na linha \( i \)  e coluna \( j \) a
+probabilidade \( p_{i,j}^{(n)} \), i.e., a probabilidade do processo passar do
+estado \( i \) para o estado \( j \) em \( n \) passos. \\
+
+\textit{Exemplo em R:} \\
+
+No código abaixo é mostrado que em 2 passos, \( n = 2 \), as probabilidades de
+transição mudam, ou seja, elas dependem de \( n \).
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+library(markovchain)
+# mpt: matriz de probabilidades de transição
+mpt <- new("markovchain", name = "Experiência da urna"
+           , states = as.character(10:5)
+           , transitionMatrix = matrix(c(5/10, 5/10, 0, 0, 0, 0
+                                         , 0, 5/9, 4/9, 0, 0, 0
+                                         , 0, 0, 5/8, 3/8, 0, 0
+                                         , 0, 0, 0, 5/7, 2/7, 0
+                                         , 0, 0, 0, 0, 5/6, 1/6
+                                         , 0, 0, 0, 0, 0, 1)
+                                       , byrow = TRUE, ncol = 6))
+mpt**2
+@
+\vspace{-.45cm}
+\horrule{.5pt}
+
+\section*{Exercício 2 [18, pg 54]}
+\addcontentsline{toc}{section}{Exercício 2}
+
+\horrule{1pt} \\
+
+\textbf{Seja \{\( X_{n} : n \geq 0\)\} uma Cadeia de Markov. Mostre que}
+
+\[ P(X_{0} = x_{0} | X_{1} = x_{1}, \cdots, X_{n} = x_{n}) = P(X_{0} = x_{0} | X_{1} = x_{1}). \]
+\vspace{.25cm}
+
+Temos aqui uma probabilidade condicional,
+\( P(X_{0} = x_{0} | X_{1} = x_{1}, \cdots, X_{n} = x_{n}) \), logo
+
+\[ P(X_{0} = x_{0} | X_{1} = x_{1}, \cdots, X_{n} = x_{n}) = \frac{P(X_{0} = x_{0}, X_{1} = x_{1}, \cdots, X_{n} = x_{n})}{P(X_{1} = x_{1}, \cdots, X_{n} = x_{n})}. \]
+\vspace{.1cm}
+
+Já um dado \textbf{Teorema} nos diz que para uma Cadeia de Markov
+\{\( X_{n} : n \geq 0\)\},
+\vspace{-.5cm}
+
+\begin{multline*}
+ P(X_{0} = x_{0}, X_{1} = x_{1}, \cdots, X_{n} = x_{n}) = \\
+ P(X_{n} = x_{n}) P(X_{n-1} = x_{n-1} | X_{n} = x_{n}) \cdots P(X_{1} = x_{1} | X_{2} = x_{2}) P(X_{0} = x_{0} | X_{1} = x_{1}).
+\end{multline*}
+
+\vspace{.1cm}
+Dessa forma
+\vspace{-.5cm}
+
+\begin{multline*}
+ P(X_{0} = x_{0} | X_{1} = x_{1}, \cdots, X_{n} = x_{n}) = \\
+ \frac{P(X_{n} = x_{n}) P(X_{n-1} = x_{n-1} | X_{n} = x_{n}) \cdots P(X_{1} = x_{1} | X_{2} = x_{2}) P(X_{0} = x_{0} | X_{1} = x_{1})}{P(X_{n} = x_{n}) P(X_{n-1} = x_{n-1} | X_{n} = x_{n}) \cdots P(X_{1} = x_{1} | X_{2} = x_{2})}.
+\end{multline*}
+
+\vspace{.1cm}
+Ou seja,
+
+\[ P(X_{0} = x_{0} | X_{1} = x_{1}, \cdots, X_{n} = x_{n}) = P(X_{0} = x_{0} | X_{1} = x_{1}). \]
+
+\section*{Exercício 3 [4, pg 79]}
+\addcontentsline{toc}{section}{Exercício 3}
+
+\horrule{1pt} \\
+
+\textbf{Uma Cadeia de Markov a três estados tem a seguinte como matriz de
+        probabilidades de transição:}
+
+\[ P = \begin{pmatrix}
+        0.25 & 0.5 & 0.25 \\ 
+        0.4 & 0.6 & 0 \\ 
+        1 & 0 & 0 
+       \end{pmatrix} \]
+\vspace{.25cm}
+
+\textbf{a) Qual é o valor aproximado de \( p_{1, 3}^{(100)} \)?
+           Que interpretação você dá a esse resultado?} \\
+
+\( P^{(100)} \):
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+mpt <- new("markovchain", name = "Cadeia a três estados"
+           , states = as.character(1:3)
+           , transitionMatrix = matrix(c(.25, .5, .25
+                                         , .4, .6, 0
+                                         , 1, 0, 0)
+                                       , byrow = TRUE, ncol = 3))
+mpt**100
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+O valor aproximado de \( p_{1, 3}^{(100)} \) é igual a 0.1. \\
+
+Isso significa que 0.1 é a probabilidade da cadeia passar do estado 1 para o
+estado 3 em 100 passos. \\
+
+\textbf{b) Qual é a probabilidade de que após o terceiro passo a cadeia esteja
+           no estado 3 se o vetor de probabilidades inicial é
+           \( (1/3, 1/3, 1/3) \)?} \\
+
+A probabilidade desejada pode ser obtida com a aplicação da seguinte equação
+
+\eqnb
+ P(X_{n+1} = y) = \sum_{x \in S} P(X_{n} = x) p_{x,y}. \label{prob_after}
+\eqne
+
+\vspace{.1cm}
+Conhecemos a distribuição de \( X_{0} \), \( (1/3, 1/3, 1/3) \), logo podemos
+usar o resultado em (\ref{prob_after}) para encontrar a distribuição de
+\( X_{1} \). Em seguida, sabendo a distribuição de \( X_{1} \), utilizamos
+(\ref{prob_after}) novamente para encontrar a distribuição de \( X_{2} \).
+Da mesma forma, encontramos a distribuição de \( X_{3} \) aplicando mais uma
+vez a relação encontrada em (\ref{prob_after}). \\
+
+Com o código em R abaixo temos a distribuição de \( X_{3} \)
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+round(
+  c(1/3, 1/3, 1/3)*(mpt**3)
+  , 3)
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+A probabilidade de que após o terceiro passo a cadeia esteja no estado 3 é de
+0.092 (9\%, arredondando).
+
+\section*{Exercício 4 [15 pg 81]}
+\addcontentsline{toc}{section}{Exercício 4}
+
+\horrule{1pt} \\
+
+\textbf{\textit{Resposta Imunológica}}
+\textbf{Um estudo de resposta imunológica em coelhos classificou os coelhos em
+        quatro grupos de acordo com a intensidade da reposta
+        imune\footnote{McGilchrist, C.A., C.W. Aisbett, and S. Cooper. (1989.)
+                       "A Markov Transition Model in the Analysis of the Immune
+                        Response". Journal of Theoretical Biology, Vol. 138,
+                       pp. 17-21.}. De uma semana para a seguinte, os coelhos
+        alteram a classificação de um grupo para o outro, de acordo com a
+        seguinte matriz de transição:}
+
+\[ P = \bordermatrix{~ & 1 & 2 & 3 & 4 \cr
+                     1 & 5/7 & 2/7 & 0 & 0 \cr
+                     2 & 0 & 1/2 & 1/3 & 1/6 \cr
+                     3 & 0 & 0 & 1/2 & 1/2 \cr
+                     4 & 0 & 0 & 1/4 & 3/4 \cr} \]
+\vspace{.25cm}
+
+\textbf{a) Qual a proporção dos coelhos no grupo 1 que ainda estavam no grupo
+           1 cinco semanas mais tarde?} \\
+
+Em uma semana, um passo, 5/7 (\Sexpr{round(5/7*100, 2)}\%) dos coelhos no grupo
+1 ainda estavam no grupo 1. \\
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+mpt <- new("markovchain", name = "Resposta imunológica"
+           , states = as.character(1:4)
+           , transitionMatrix = matrix(c(5/7, 2/7, 0, 0
+                                         , 0, 1/2, 1/3, 1/6
+                                         , 0, 0, 1/2, 1/2
+                                         , 0, 0, 1/4, 3/4)
+                                       , byrow = TRUE, ncol = 4))
+mpt**5
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+Em cinco semanas, 18.59\% dos coelhos no grupo 1 ainda estavam no grupo 1. \\
+
+\textbf{b) Na primeira semana, havia nove coelhos no primeiro grupo, 4 no
+           segundo e nenhum no terceiro e quarto grupo. Quantos coelhos seria
+           de esperar em cada grupo após 4 semanas?} \\
+
+Podemos imaginar o número de coelhos em cada grupo na primeira semana como uma
+espécie de distribuição inicial. \\
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+round(
+  c(9, 4, 0, 0)*(mpt**4)
+  , 0)
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+Após 4 semanas é de se esperar 2 coelhos no primeiro grupo, 3 no segundo e
+terceiro grupo, e cinco no quarto grupo. \\
+
+\textbf{c) Ao investigar a matriz de transição elevada a potências cada vez
+           maiores, faça uma suposição razoável para a probabilidade a longo
+           tempo que um coelho no grupo 1 ou 2 ainda esteja no grupo 1 ou 2
+           depois de um tempo arbitrariamente longo. Explique por que esta
+           resposta é razoável.} \\
+
+No código R fornecido a seguir a matriz de probabilidades de transição foi 
+elevada a três diferentes potências, 100, 1250 e 2500. \\
+
+Na primeira potência, 100, que já é alta, as probabilidades dos coelhos
+permanecerem nos grupos 1 e 2 é bem baixa, 2 e 3e-15. Conforme aumentamos a
+potências essa probabilidades vão diminuindo, chegando a ser igual a zero com a
+potência 2500. \\
+
+Ou seja, conforme a potência aumenta as probabilidades diminuem, chegando a
+zero. \\
+
+Mas o que isso significa e por que isso é razoável de se considerar? \\
+
+Cada potência é um passo, i.e., uma semana. Cada estado é um grupo definido de
+acordo com a intensidade da resposta imunológica dos ratos, logo, conforme o
+tempo passa é de se esperar que a resposta imunológica dos ratos diminua, já
+que eles vão ficando mais velhos, chegando ao ponto de ser impossivel
+(probabilidade zero) permanecer nos grupos 1 e 2. \\
+
+\horrule{.5pt}
+\vspace{-.75cm}
+
+<<>>=
+mpt**100
+mpt**1250
+mpt**2500
+@
+\vspace{-.45cm}
+\horrule{.5pt}
+
+\section*{Exercício 5 [16, pg 82]}
+\addcontentsline{toc}{section}{Exercício 5}
+
+\horrule{1pt} \\
+
+\textbf{\textit{Criminologia}}
+\textbf{Num estudo com homens criminosos em Filadélfia descobriram que a
+        probabilidade de que um tipo de ataque seja seguido por um outro tipo
+        pode ser descrito pela seguinte matriz de
+        transição\footnote{Stander, Julian, et al. (1989). "Markov Chain
+                           Analysis and Specialization in Criminal Careers".
+                           The British Journal of Criminology, Vol. 29, No.4,
+                           pp. 319-335.}.}
+
+\[ P = \bordermatrix{
+  ~ & {\rm Outro} & \text{Injúria} & {\rm Roubo} & {\rm Dano} & {\rm Misto} \cr
+  {\rm Outro} & 0.645 & 0.099 & 0.152 & 0.033 & 0.071 \cr
+  \text{Injúria} & 0.611 & 0.138 & 0.128 & 0.033 & 0.090 \cr
+  {\rm Roubo} & 0.514 & 0.067 & 0.271 & 0.030 & 0.118 \cr
+  {\rm Dano} & 0.609 & 0.107 & 0.178 & 0.064 & 0.042 \cr
+  {\rm Misto} & 0.523 & 0.093 & 0.183 & 0.022 & 0.179 \cr} \]
+\vspace{.25cm}
+
+\textbf{a) Para um criminoso que comete roubo, qual é a probabilidade de que o
+           seu próximo crime também seja um roubo?} \\
+
+0.271. \\
+
+A probabilidade de que um criminoso no estado 'Roubo' permaneça em um passo no
+estado 'Roubo' é de 27\%. \\
+
+
+\textbf{b) Para um criminoso que comete roubo, qual é a probabilidade de que
+           seu segundo crime depois do atual também seja um roubo?} \\
+
+Estamos interessados na probabilidade de que um criminoso que se encontra no
+estado 'Roubo' esteja no estado 'Roubo' no segundo passo. \\
+
+No código abaixo as probabilidades de transição em dois passos são calculadas. 
+\\
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+mpt <- new("markovchain", name = "Criminologia"
+           , states = c("Outro", "Injúria", "Roubo", "Dano", "Misto")
+           , transitionMatrix = matrix(c(0.645, 0.099, 0.152, 0.033, 0.071
+                                         , 0.611, 0.138, 0.128, 0.033, 0.090
+                                         , 0.514, 0.067, 0.271, 0.030, 0.118
+                                         , 0.609, 0.107, 0.178, 0.064, 0.042
+                                         , 0.523, 0.093, 0.183, 0.022, 0.179)
+                                       , byrow = TRUE, ncol = 5))
+mpt**2
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+A probabilidade de interesse é de 18.7\%. \\
+
+\textbf{c) Se essas tendências continuarem, quais são as probabilidades de
+           longo prazo para cada tipo de crime?} \\
+
+No código abaixo a matriz de probabilidades de transição é elevada a três 
+diferentes potências, 5, 10 e 50. Independente da potência as probabilidades
+são iguais, com pequenas diferenças a partir da quarta, quinta casa decimal.
+Conforme a potência aumenta as diferenças vão diminuindo. \\
+
+\horrule{.5pt}
+\vspace{-.75cm}
+<<>>=
+mpt**5
+mpt**10
+mpt**50
+@
+\vspace{-.45cm}
+\horrule{.5pt} \\
+
+Todas as probabilidades de transição são idênticas, independente do estado de
+origem. \\
+
+A longo prazo a maior probabilidade é de que um criminoso pratique um outro
+tipo de crime, com 60.68\%. A segunda maior probabilidade é de que um criminoso
+cometa um roubo, com 17.4\%. \\
+
+Com menor probabilidade, 3.25\%, se espera que um criminoso pratique um dano. 
+
+\vspace{\fill}
+\horrule{1pt} \\
+
+\end{document}
