@@ -2,7 +2,7 @@
 
 ***
 
-Repository with the activities for discipline ce064
+Repository with the developed activities for discipline ce064
 
 ***
 
