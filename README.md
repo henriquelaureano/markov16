@@ -20,3 +20,5 @@ Repository with the developed activities for discipline ce064
 *Activities:*
 
 + [List 1](http://mynameislaure.github.io/ce064mm-list_1/master.pdf)
+
++ [List 2](http://mynameislaure.github.io/ce064mm-list_2/master.pdf)
