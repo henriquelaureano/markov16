@@ -1,0 +1,503 @@
+\documentclass[12pt]{article}
+\usepackage[brazilian, brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[top = 2.5cm, left = 2.5cm, right = 2.5cm, bottom = 2.5cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+\usepackage{breqn}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\setlength\parindent{0pt}
+\newcommand{\eqnb}{\begin{equation}}
+\newcommand{\eqne}{\end{equation}}
+\newcommand{\eqnbs}{\begin{equation*}}
+\newcommand{\eqnes}{\end{equation*}}
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+
+\title{  
+ \normalfont \normalsize 
+ \textsc{ce064 - Modelos Markovianos \\
+         (Tópicos Especiais em Estatística IV)} \\
+ Departamento de Estatística \\
+ Universidade Federal do Paraná \\ [25pt]
+ \horrule{.5pt} \\ [.4cm]
+ \huge Trabalho  No.2 \\
+ \horrule{2pt} \\[ .5cm]}
+ 
+\author{Henrique Aparecido Laureano \\ \normalsize{GRR: 20115307}}
+\date{\normalsize Junho de 2016}
+
+\begin{document}
+
+\maketitle
+
+\vspace{\fill}
+
+\tableofcontents
+
+\horrule{1pt} \\
+
+\newpage
+
+<<setup, include=FALSE>>=
+library(knitr)
+
+tema <- knit_theme$get("acid")
+
+knit_theme$set(tema)
+
+opts_chunk$set(size='small'
+               , cache=TRUE, cache.path='cache/'
+               , comment=NA, warning=FALSE, message=FALSE
+               , fig.align='center', fig.width=8, fig.height=4.5
+               , dpi=100, fig.path='iBagens/', fig.pos='H'
+               , background='#ffffff'
+               , results='hold', fig.show='hold')
+@
+
+\section*{Objetivo}
+\addcontentsline{toc}{section}{Objetivo}
+
+\horrule{1pt} \\
+
+\textbf{Modelar uma série de log-retornos correspondente à cotação do Euro em
+        relação ao Dólar Americano entre 03 de janeiro de 2012 e 30 de março
+        de 2015, utilizando Modelos Ocultos de Markov.} \\
+
+\textbf{O log-retorno é definido como}
+
+\[ r_{t} = {\rm log} (y_{t}/x_{t}), \]
+
+\textbf{em que \(y_{t}\) representa, aqui, o valor do câmbio no fechamento do
+        dia de operações na bolsa de valores e \(x_{t}\) representa o valor na
+        abertura dos negócios.} \\
+
+\textbf{Os dados são contínuos, o que sugere uma resposta gaussiana para o
+        log-retorno e dois (decisão de vender ou comprar dólares) ou três
+        (acrescentar, ainda, a situação de não mexer na carteira de Euros)
+        estados para a Cadeia de Markov oculta.}
+
+\section*{Análise descritiva}
+\addcontentsline{toc}{section}{Análise descritiva}
+
+\horrule{1pt} \\
+
+Com o auxílio da Figura \ref{fig:ads}, página 3, observa-se que durante toda a
+série temporal os valores de abertura, fechamento, mínimo e máximo não diferem
+muito, i.e., nenhuma discrepância é observada.
+
+Nos últimos meses do primeiro semestre de 2012 observa-se uma queda, seguida de
+uma subida e de uma constância até o final do primeiro semestre de 2014. Desse
+período em diante uma queda considerável é observada.
+
+<<ads, fig.cap="Valores diários do câmbio na abertura, maior e menor valor da cotação da moeda e do valor no fechamento do mercado de câmbio">>=
+# <code r> ================================================================== #
+path <- "C:/Users/henri/Dropbox/Scripts/markovian models/list 2/"
+
+dados <- read.csv(paste0(path, "EURUSD1d.csv"))
+
+datas <- as.Date(substr(dados$Open.Timestamp, 1, 10), format = "%Y.%m.%d")
+
+library(latticeExtra)
+
+xyplot(dados$Open + dados$High + dados$Low + dados$Close ~ datas
+       , type = c("l", "g")
+       , col = 1:4
+       , lwd = 2
+       , xlab = "Tempo: ano-mês"
+       , ylab = NULL
+       , key = list(text = list(c("Abertura", "Maior", "Menor", "Fechamento"))
+                    , lines = TRUE
+                    , col = 1:4
+                    , lwd = 2
+                    , columns = 4))
+# </code r> ================================================================= #
+@
+
+Olhando para os valores de log-retorno na Figura \ref{fig:adlr}, página 4,
+nota-se uma grande variação logo no início do segundo semestre de 2013, mas que
+se mostra passageira. O primeiro semestre de 2014 é o período que apresenta as
+menores variações do log-retorno. A partir desse semestre sua variabilidade
+volta a aumentar.
+
+<<adlr, fig.cap="Valores do log-retorno">>=
+# <code r> ================================================================== #
+logretorno <- log(dados$Close) - log(dados$Open)
+
+xyplot(logretorno ~ datas
+       , type = c("l", "g")
+       , lwd = 2
+       , xlab = "Tempo: ano-mês"
+       , ylab = list(rot = 0, label = expression(r[t])))
+# </code r> ================================================================= #
+@
+
+\section*{Modelos Ocultos de Markov}
+\addcontentsline{toc}{section}{Modelos Ocultos de Markov}
+
+\horrule{1pt} \\
+
+<<>>=
+# <code r> ================================================================== #
+library(HiddenMarkov)
+# </code r> ================================================================= #
+@
+
+\subsection*{Modelo de dois estados}
+\addcontentsline{toc}{subsection}{Modelo de dois estados}
+
+\horrule{.5pt} \\
+
+Para a Cadeia de Markov oculta pode-se pensar em dois estados, vender e comprar
+dólares. \\
+
+Um log-retorno negativo indica que o valor da cotação no fechamento é inferior
+ao valor na abertura, logo, a tomada de decisão mais indicada é vender dólares.
+Consequentemente, um log-retorno positivo indica à compra.
+
+<<>>=
+# <code r> ================================================================== #
+## 0: venda
+## 1: compra
+logest2 <- ifelse(logretorno < 0, 0, 1)
+# </code r> ================================================================= #
+@
+
+É necessário fornecer uma matriz de probabilidades de transição iniciais entre
+os estados. \\
+
+Tenta-se propor uma boa matriz, no sentido de ser altamente coerente com o que
+acontece com os log-retornos ao longo da série temporal. \\
+
+Para cada log-retorno foi obtido um valor, 0 ou 1, indicando se o mais adequado
+seria vender ou comprar dólares, respectivamente. Ou seja, para qual estado
+aquele log-retorno corresponde.
+
+<<>>=
+# <code r> ================================================================== #
+table(logest2)
+# </code r> ================================================================= #
+@
+
+Em 513 dias o mais adequado seria vender, e em 495, comprar. \\
+
+Fazendo a diferença entre esses valores obtidos é retornado novos três valores:
+
+<<>>=
+# <code r> ================================================================== #
+unique(diff(logest2))
+# </code r> ================================================================= #
+@
+
+O valor -1 é obtido quando o log-retorno do dia \(x\) é 1 e do dia \(x + 1\) é
+0, i.e., no dia \(x\) a tomada de decisão indicada é a compra e no dia seguinte
+é a venda.
+
+<<>>=
+# <code r> ================================================================== #
+table(diff(logest2) == -1)
+# </code r> ================================================================= #
+@
+
+Dos 1008 log-retornos e consequentemente, 1007 diferenças, 258 correspondem
+a transição do estado 1 (compra) para o estado 0 (venda).
+
+<<>>=
+# <code r> ================================================================== #
+table(diff(logest2) == -1)[[2]] / length(diff(logest2))
+# </code r> ================================================================= #
+@
+
+Já o valor 1 é obtido quando o log-retorno do dia \(x\) é 0 e do dia \(x + 1\)
+é 1, i.e., no dia \(x\) a tomada de decisão indicada é a venda e no dia
+seguinte é a compra.
+
+<<>>=
+# <code r> ================================================================== #
+table(diff(logest2) == 1)
+# </code r> ================================================================= #
+@
+
+257 é o número de transições do estado 0 (venda) para o estado 1 (compra).
+
+<<>>=
+# <code r> ================================================================== #
+table(diff(logest2) == 1)[[2]] / length(diff(logest2))
+# </code r> ================================================================= #
+@
+
+Em ambas situações observa-se que o número de mudanças de tomada de decisão de
+um dia para o outro é praticamente a metade do número de ocorrências de cada
+estado. Isso nos faz pensar que a matriz de probabilidades de transição que
+melhor representa essa série temporal é dada por
+
+\[ P = \bordermatrix{
+  ~ & {\rm Venda} & {\rm Compra} \cr
+  {\rm Venda} & 0.50 & 0.50 \cr
+  {\rm Compra} & 0.50 & 0.50 \cr}. \]
+
+Isto é, probabilidade de 50\% de transitar e de permanecer em cada estado, para
+ambos os estados. \\
+
+Para a série temporal é considerada uma distribuição Normal, e para cada estado
+o chute inicial dos parâmetros de sua respectiva Normal é a própria média e
+desvio padrão observados.
+
+<<>>=
+# <code r> ================================================================== #
+model_e2 <- BaumWelch(dthmm(logretorno
+                            , Pi = matrix(rep(.5, 4), byrow = TRUE, nrow = 2)
+                            , delta = c(0, 1)
+                            , "norm"
+                            , list(
+                              mean = c(mean(logretorno[logest2 == 0])
+                                       , mean(logretorno[logest2 == 1]))
+                              , sd = c(sd(logretorno[logest2 == 0])
+                                       , sd(logretorno[logest2 == 1]))))
+                      , control = list(prt = FALSE
+                                       , maxiter = 500
+                                       , tol = 1e-05
+                                       , posdiff = TRUE
+                                       , converge = expression(diff < tol)))
+
+# </code r> ================================================================= #
+@
+
+Antes de sair tirando conclusões verificamos a qualidade do ajuste na Figura
+\ref{fig:r2}:
+
+<<r2, fig.cap="Análise gráfica dos (pseudo-) resíduos. (a): resíduos segundo a ordem das observações com acéscimo de linhas em zero, 1.96 (mais e menos) e 2.58 (mais e menos), seguindo a 'regra' dos três desvios padrão; (b): envelope simulado para os resíduos">>=
+# <code r> ================================================================== #
+par(mfrow = c(1, 2)) ; plot(resid(model_e2)
+                            , ylim = c(-4.25, 4.25)
+                            , ylab = "Pseudo-resíduos"
+                            , xlab = "Dias"
+                            , las = 1
+                            , main = "(a)") ; grid(col = 1) ; abline(
+                              h = c(0, -1.96, 1.96, -2.58, 2.58)
+                              , lty = c(1, 2, 2, 4, 4))
+library(car)
+
+qqPlot(residuals(model_e2)
+       , xlab = "Quantis teóricos"
+       , ylab = "Pseudo-resíduos"
+       , las = 1
+       , main = "(b)") ; layout(1)
+# </code r> ================================================================= #
+@
+
+Sem grandes problemas, não rejeitamos a presença de um comportamento aleatório
+e a normalidade dos pseudo-resíduos. \\
+
+Abaixo observa-se a matriz de probabilidades de transição estimada
+
+<<>>=
+# <code r> ================================================================== #
+model_e2$Pi
+# </code r> ================================================================= #
+@
+
+As probabilidades estimadas diferem bastante das utilizadas como chutes 
+iniciais. \\
+
+Estima-se maiores probabilidades de permanência, com destaque para o segundo
+estado (compra), que apresenta uma menor probabilidade de transição, i.e.,
+em dias consecutivos é mais próvavel que a tomada de decisão seja a mesma,
+e se for pra ela mudar, é mais próvavel que ela mude pra tomada de decição
+venda \(\rightarrow\) compra. \\
+
+Para o estado venda foi atribuído como chute inicial uma média de
+\(\Sexpr{round(mean(logretorno[logest2 == 0]), 5)}\) e um desvio padrão de
+\(\Sexpr{round(sd(logretorno[logest2 == 0]), 5)}\), e foi estimada uma média
+de \(\Sexpr{round(model_e2$pm$mean[1], 5)}\) e um desvio padrão de
+\(\Sexpr{round(model_e2$pm$sd[1], 5)}\). \\
+
+Para o estado compra foi atribuído como chute inicial uma média de
+\(\Sexpr{round(mean(logretorno[logest2 == 1]), 5)}\) e um desvio padrão de
+\(\Sexpr{round(sd(logretorno[logest2 == 1]), 5)}\), e foi estimada uma média
+de \(\Sexpr{round(model_e2$pm$mean[2], 5)}\) e um desvio padrão de
+\(\Sexpr{round(model_e2$pm$sd[2], 5)}\). \\
+
+Uma vez que o modelo foi escolhido é possível fazer a predição dos estados da
+Cadeia de Markov. \\
+
+Observa-se com a Figura \ref{fig:pred2} que para retornos próximos de zero a
+Cadeia está associando a tomada de decisão compra, e para valores mais 
+distantes, venda. Contudo, pela lógica, para a tomada de decisão compra se deve
+ter log-retornos maiores que zero, e para a tomada de decisão venda,
+log-retornos menores que zero.
+
+<<pred2, fig.cap="Predição dos dois estados da Cadeia de Markov">>=
+# <code r> ================================================================== #
+xyplot(
+  logretorno ~ 1:length(logretorno) | factor(
+    Viterbi(model_e2)
+    , labels = c("Vendo dólar", "Compro dólar"))
+  , type = c("p", "g")
+  , col = 1
+  , strip = strip.custom(bg = "white")
+  , scales = list(alternating = 1)
+  , xlab = "Dias"
+  , ylab = "log-retorno")
+# </code r> ================================================================= #
+@
+
+Diferentes chutes iniciais para a matriz de probabilidades de transição foram
+utilizados, entretanto as probabilidades estimadas diferiram muito pouco,
+levando aos mesmos resultados de predição. \\
+
+Uma alternativa é aumentar o número de estados da Cadeia de Markov oculta.
+
+\subsection*{Modelo de três estados}
+\addcontentsline{toc}{subsection}{Modelo de três estados}
+
+\horrule{.5pt} \\
+
+O novo estado é a tomada de decisão espera, i.e., não mexer na carteira de 
+Euros.
+
+<<>>=
+# <code r> ================================================================== #
+logest3 <- ifelse(
+  logretorno >= -.0025 & logretorno <= .0025, 0, ifelse(
+    logretorno < -.0025, -1, 1))
+
+table(logest3)
+# </code r> ================================================================= #
+@
+
+Foi usado como delimitadores pra esse novo estado log-retornos no intervalo
+\(\pm 0.0025\). \\
+
+Observa-se que dos 1008 log-retornos, 534 (53\%) se encaixam nesse estado
+(0: espera). Com um número bem equilibrado acima e abaixo, estados venda (-1)
+e compra (1), respectivamente. \\
+
+Com base no aprendizado obtido com o Modelo Oculto de Markov de dois estados,
+foi atribuído como chute inicial iguais probabilidades de transição para os
+estados.
+
+<<>>=
+# <code r> ================================================================== #
+model_e3 <- BaumWelch(dthmm(logretorno
+                            , Pi = matrix(rep(1/3, 9), byrow = TRUE, nrow = 3)
+                            , delta = c(0, 0, 1)
+                            , "norm"
+                            , list(
+                              mean = c(mean(logretorno[logest3 == 0])
+                                       , mean(logretorno[logest3 == -1])
+                                       , mean(logretorno[logest3 == 1]))
+                              , sd = c(sd(logretorno[logest3 == 0])
+                                       , sd(logretorno[logest3 == -1])
+                                       , sd(logretorno[logest3 == 1]))))
+                      , control = list(prt = FALSE
+                                       , maxiter = 500
+                                       , tol = 1e-05
+                                       , posdiff = TRUE
+                                       , converge = expression(diff < tol)))
+# </code r> ================================================================= #
+@
+
+Com a Figura \ref{fig:r3} observa-se um ajuste satisfatório do modelo e em
+seguida a matriz de probabilidades de transição estimada.
+
+<<r3, fig.cap="Análise gráfica dos (pseudo-) resíduos. (a): resíduos segundo a ordem das observações com acéscimo de linhas em zero, 1.96 (mais e menos) e 2.58 (mais e menos), seguindo a 'regra' dos três desvios padrão; (b): envelope simulado para os resíduos">>=
+# <code r> ================================================================== #
+par(mfrow = c(1, 2)) ; plot(resid(model_e3)
+                            , ylim = c(-4.5, 4.5)
+                            , ylab = "Pseudo-resíduos"
+                            , xlab = "Dias"
+                            , las = 1
+                            , main = "(a)") ; grid(col = 1) ; abline(
+                              h = c(0, -1.96, 1.96, -2.58, 2.58)
+                              , lty = c(1, 2, 2, 4, 4))
+qqPlot(residuals(model_e3)
+       , xlab = "Quantis teóricos"
+       , ylab = "Pseudo-resíduos"
+       , las = 1
+       , main = "(b)") ; layout(1)
+# </code r> ================================================================= #
+@
+
+<<>>=
+# <code r> ================================================================== #
+model_e3$Pi
+# </code r> ================================================================= #
+@
+
+A maior probabilidade de permanência é estimada para o primeiro estado, espera.
+A partir desse estado é mais provável transitar para o 3, compra (probabilidade
+0.42). \\
+
+O estado compra é o que apresenta a menor probabilidade de permanência, tendo
+64\% de chance de transitar para o estado venda. \\
+
+Do estado venda a maior probabilidade (0.58) é de transitar para o estado
+compra. \\
+
+Para o estado espera foi atribuído como chute inicial uma média de
+\(\Sexpr{round(mean(logretorno[logest3 == 0]), 5)}\) e um desvio padrão de
+\(\Sexpr{round(sd(logretorno[logest3 == 0]), 5)}\), e foi estimada uma média
+de \(\Sexpr{round(model_e3$pm$mean[1], 5)}\) e um desvio padrão de
+\(\Sexpr{round(model_e3$pm$sd[1], 5)}\). \\
+
+Para o estado venda foi atribuído como chute inicial uma média de
+\(\Sexpr{round(mean(logretorno[logest3 == -1]), 5)}\) e um desvio padrão de
+\(\Sexpr{round(sd(logretorno[logest3 == -1]), 5)}\), e foi estimada uma média
+de \(\Sexpr{round(model_e3$pm$mean[2], 5)}\) e um desvio padrão de
+\(\Sexpr{round(model_e3$pm$sd[2], 5)}\). \\
+
+Para o estado compra foi atribuído como chute inicial uma média de
+\(\Sexpr{round(mean(logretorno[logest3 == 1]), 5)}\) e um desvio padrão de
+\(\Sexpr{round(sd(logretorno[logest3 == 1]), 5)}\), e foi estimada uma média
+de \(\Sexpr{round(model_e3$pm$mean[3], 5)}\) e um desvio padrão de
+\(\Sexpr{round(model_e3$pm$sd[3], 5)}\). \\
+
+Uma vez que o modelo foi escolhido é possível fazer a predição dos estados da
+Cadeia de Markov.
+
+<<pred3, fig.cap="Predição dos três estados da Cadeia de Markov">>=
+# <code r> ================================================================== #
+xyplot(
+  logretorno ~ 1:length(logretorno) | factor(
+    Viterbi(model_e3)
+    , labels = c("Espero", "Vendo dólar", "Compro dólar"))
+  , type = c("p", "g")
+  , col = 1
+  , strip = strip.custom(bg = "white")
+  , scales = list(alternating = 1)
+  , xlab = "Dias"
+  , ylab = "log retorno")
+# </code r> ================================================================= #
+@
+
+Com a Figura \ref{fig:pred3} se observa uma maior coerência de resultados,
+se comparada com a Figura \ref{fig:pred2}.
+
+Aqui, para log-retornos muito próximos de zero a tomada de decisão é esperar
+(ok, como foi imaginado). \\
+
+O ideal seria apenas log-retornos positivos para a tomada de decisão compra,
+e log-retornos negativos pra tomada de decisão venda, contudo, observa-se um
+maior número de log-retornos negativos e menores para o estado venda, e um
+maior número de log-retornos positivos e grandes para o estado compra. \\
+
+Esses resultados não são excelentes, mas são bons e plausíveis. Talvez esse 
+seja o melhor possível que a abordagem de Modelos Ocultos de Markov pode obter
+para essa série temporal. \\
+
+Diferentes chutes iniciais para a matriz de probabilidades de transição foram
+utilizados, entretanto as probabilidades estimadas diferiram muito pouco,
+levando aos mesmos resultados de predição.
+
+\vspace{\fill}
+\horrule{1pt} \\
+
+\end{document}

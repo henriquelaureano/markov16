@@ -1,0 +1,708 @@
+\documentclass[12pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0, 0, 0}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.502,0,0.502}{\textbf{#1}}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.651,0.522,0}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{1,0.502,0}{#1}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{1,0,0.502}{\textbf{#1}}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.733,0.475,0.467}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.502,0.502,0.753}{\textbf{#1}}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0,0.502,0.753}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0,0.267,0.4}{#1}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage[brazilian, brazil]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[top = 2.5cm, left = 2.5cm, right = 2.5cm, bottom = 2.5cm]{geometry}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+\usepackage{breqn}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\setlength\parindent{0pt}
+\newcommand{\eqnb}{\begin{equation}}
+\newcommand{\eqne}{\end{equation}}
+\newcommand{\eqnbs}{\begin{equation*}}
+\newcommand{\eqnes}{\end{equation*}}
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}}
+
+\title{  
+ \normalfont \normalsize 
+ \textsc{ce064 - Modelos Markovianos \\
+         (Tópicos Especiais em Estatística IV)} \\
+ Departamento de Estatística \\
+ Universidade Federal do Paraná \\ [25pt]
+ \horrule{.5pt} \\ [.4cm]
+ \huge Trabalho  No.2 \\
+ \horrule{2pt} \\[ .5cm]}
+ 
+\author{Henrique Aparecido Laureano \\ \normalsize{GRR: 20115307}}
+\date{\normalsize Junho de 2016}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\maketitle
+
+\vspace{\fill}
+
+\tableofcontents
+
+\horrule{1pt} \\
+
+\newpage
+
+
+
+\section*{Objetivo}
+\addcontentsline{toc}{section}{Objetivo}
+
+\horrule{1pt} \\
+
+\textbf{Modelar uma série de log-retornos correspondente à cotação do Euro em
+        relação ao Dólar Americano entre 03 de janeiro de 2012 e 30 de março
+        de 2015, utilizando Modelos Ocultos de Markov.} \\
+
+\textbf{O log-retorno é definido como}
+
+\[ r_{t} = {\rm log} (y_{t}/x_{t}), \]
+
+\textbf{em que \(y_{t}\) representa, aqui, o valor do câmbio no fechamento do
+        dia de operações na bolsa de valores e \(x_{t}\) representa o valor na
+        abertura dos negócios.} \\
+
+\textbf{Os dados são contínuos, o que sugere uma resposta gaussiana para o
+        log-retorno e dois (decisão de vender ou comprar dólares) ou três
+        (acrescentar, ainda, a situação de não mexer na carteira de Euros)
+        estados para a Cadeia de Markov oculta.}
+
+\section*{Análise descritiva}
+\addcontentsline{toc}{section}{Análise descritiva}
+
+\horrule{1pt} \\
+
+Com o auxílio da Figura \ref{fig:ads}, página 3, observa-se que durante toda a
+série temporal os valores de abertura, fechamento, mínimo e máximo não diferem
+muito, i.e., nenhuma discrepância é observada.
+
+Nos últimos meses do primeiro semestre de 2012 observa-se uma queda, seguida de
+uma subida e de uma constância até o final do primeiro semestre de 2014. Desse
+período em diante uma queda considerável é observada.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{path} \hlkwb{<-} \hlstr{"C:/Users/henri/Dropbox/Scripts/markovian models/list 2/"}
+
+\hlstd{dados} \hlkwb{<-} \hlkwd{read.csv}\hlstd{(}\hlkwd{paste0}\hlstd{(path,} \hlstr{"EURUSD1d.csv"}\hlstd{))}
+
+\hlstd{datas} \hlkwb{<-} \hlkwd{as.Date}\hlstd{(}\hlkwd{substr}\hlstd{(dados}\hlopt{$}\hlstd{Open.Timestamp,} \hlnum{1}\hlstd{,} \hlnum{10}\hlstd{),} \hlkwc{format} \hlstd{=} \hlstr{"%Y.%m.%d"}\hlstd{)}
+
+\hlkwd{library}\hlstd{(latticeExtra)}
+
+\hlkwd{xyplot}\hlstd{(dados}\hlopt{$}\hlstd{Open} \hlopt{+} \hlstd{dados}\hlopt{$}\hlstd{High} \hlopt{+} \hlstd{dados}\hlopt{$}\hlstd{Low} \hlopt{+} \hlstd{dados}\hlopt{$}\hlstd{Close} \hlopt{~} \hlstd{datas}
+       \hlstd{,} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"l"}\hlstd{,} \hlstr{"g"}\hlstd{)}
+       \hlstd{,} \hlkwc{col} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{4}
+       \hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}
+       \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Tempo: ano-mês"}
+       \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlkwa{NULL}
+       \hlstd{,} \hlkwc{key} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{text} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwd{c}\hlstd{(}\hlstr{"Abertura"}\hlstd{,} \hlstr{"Maior"}\hlstd{,} \hlstr{"Menor"}\hlstd{,} \hlstr{"Fechamento"}\hlstd{))}
+                    \hlstd{,} \hlkwc{lines} \hlstd{=} \hlnum{TRUE}
+                    \hlstd{,} \hlkwc{col} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{4}
+                    \hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}
+                    \hlstd{,} \hlkwc{columns} \hlstd{=} \hlnum{4}\hlstd{))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/ads-1} 
+
+}
+
+\caption[Valores diários do câmbio na abertura, maior e menor valor da cotação da moeda e do valor no fechamento do mercado de câmbio]{Valores diários do câmbio na abertura, maior e menor valor da cotação da moeda e do valor no fechamento do mercado de câmbio}\label{fig:ads}
+\end{figure}
+
+
+\end{knitrout}
+
+Olhando para os valores de log-retorno na Figura \ref{fig:adlr}, página 4,
+nota-se uma grande variação logo no início do segundo semestre de 2013, mas que
+se mostra passageira. O primeiro semestre de 2014 é o período que apresenta as
+menores variações do log-retorno. A partir desse semestre sua variabilidade
+volta a aumentar.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{logretorno} \hlkwb{<-} \hlkwd{log}\hlstd{(dados}\hlopt{$}\hlstd{Close)} \hlopt{-} \hlkwd{log}\hlstd{(dados}\hlopt{$}\hlstd{Open)}
+
+\hlkwd{xyplot}\hlstd{(logretorno} \hlopt{~} \hlstd{datas}
+       \hlstd{,} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"l"}\hlstd{,} \hlstr{"g"}\hlstd{)}
+       \hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}
+       \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Tempo: ano-mês"}
+       \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{rot} \hlstd{=} \hlnum{0}\hlstd{,} \hlkwc{label} \hlstd{=} \hlkwd{expression}\hlstd{(r[t])))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/adlr-1} 
+
+}
+
+\caption[Valores do log-retorno]{Valores do log-retorno}\label{fig:adlr}
+\end{figure}
+
+
+\end{knitrout}
+
+\section*{Modelos Ocultos de Markov}
+\addcontentsline{toc}{section}{Modelos Ocultos de Markov}
+
+\horrule{1pt} \\
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{library}\hlstd{(HiddenMarkov)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection*{Modelo de dois estados}
+\addcontentsline{toc}{subsection}{Modelo de dois estados}
+
+\horrule{.5pt} \\
+
+Para a Cadeia de Markov oculta pode-se pensar em dois estados, vender e comprar
+dólares. \\
+
+Um log-retorno negativo indica que o valor da cotação no fechamento é inferior
+ao valor na abertura, logo, a tomada de decisão mais indicada é vender dólares.
+Consequentemente, um log-retorno positivo indica à compra.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlcom{## 0: venda}
+\hlcom{## 1: compra}
+\hlstd{logest2} \hlkwb{<-} \hlkwd{ifelse}\hlstd{(logretorno} \hlopt{<} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+É necessário fornecer uma matriz de probabilidades de transição iniciais entre
+os estados. \\
+
+Tenta-se propor uma boa matriz, no sentido de ser altamente coerente com o que
+acontece com os log-retornos ao longo da série temporal. \\
+
+Para cada log-retorno foi obtido um valor, 0 ou 1, indicando se o mais adequado
+seria vender ou comprar dólares, respectivamente. Ou seja, para qual estado
+aquele log-retorno corresponde.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{table}\hlstd{(logest2)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+logest2
+  0   1 
+513 495 
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Em 513 dias o mais adequado seria vender, e em 495, comprar. \\
+
+Fazendo a diferença entre esses valores obtidos é retornado novos três valores:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{unique}\hlstd{(}\hlkwd{diff}\hlstd{(logest2))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+[1] -1  0  1
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+O valor -1 é obtido quando o log-retorno do dia \(x\) é 1 e do dia \(x + 1\) é
+0, i.e., no dia \(x\) a tomada de decisão indicada é a compra e no dia seguinte
+é a venda.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{table}\hlstd{(}\hlkwd{diff}\hlstd{(logest2)} \hlopt{== -}\hlnum{1}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+
+FALSE  TRUE 
+  749   258 
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Dos 1008 log-retornos e consequentemente, 1007 diferenças, 258 correspondem
+a transição do estado 1 (compra) para o estado 0 (venda).
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{table}\hlstd{(}\hlkwd{diff}\hlstd{(logest2)} \hlopt{== -}\hlnum{1}\hlstd{)[[}\hlnum{2}\hlstd{]]} \hlopt{/} \hlkwd{length}\hlstd{(}\hlkwd{diff}\hlstd{(logest2))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+[1] 0.2562066
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Já o valor 1 é obtido quando o log-retorno do dia \(x\) é 0 e do dia \(x + 1\)
+é 1, i.e., no dia \(x\) a tomada de decisão indicada é a venda e no dia
+seguinte é a compra.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{table}\hlstd{(}\hlkwd{diff}\hlstd{(logest2)} \hlopt{==} \hlnum{1}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+
+FALSE  TRUE 
+  750   257 
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+257 é o número de transições do estado 0 (venda) para o estado 1 (compra).
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{table}\hlstd{(}\hlkwd{diff}\hlstd{(logest2)} \hlopt{==} \hlnum{1}\hlstd{)[[}\hlnum{2}\hlstd{]]} \hlopt{/} \hlkwd{length}\hlstd{(}\hlkwd{diff}\hlstd{(logest2))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+[1] 0.2552135
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Em ambas situações observa-se que o número de mudanças de tomada de decisão de
+um dia para o outro é praticamente a metade do número de ocorrências de cada
+estado. Isso nos faz pensar que a matriz de probabilidades de transição que
+melhor representa essa série temporal é dada por
+
+\[ P = \bordermatrix{
+  ~ & {\rm Venda} & {\rm Compra} \cr
+  {\rm Venda} & 0.50 & 0.50 \cr
+  {\rm Compra} & 0.50 & 0.50 \cr}. \]
+
+Isto é, probabilidade de 50\% de transitar e de permanecer em cada estado, para
+ambos os estados. \\
+
+Para a série temporal é considerada uma distribuição Normal, e para cada estado
+o chute inicial dos parâmetros de sua respectiva Normal é a própria média e
+desvio padrão observados.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{model_e2} \hlkwb{<-} \hlkwd{BaumWelch}\hlstd{(}\hlkwd{dthmm}\hlstd{(logretorno}
+                            \hlstd{,} \hlkwc{Pi} \hlstd{=} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{.5}\hlstd{,} \hlnum{4}\hlstd{),} \hlkwc{byrow} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nrow} \hlstd{=} \hlnum{2}\hlstd{)}
+                            \hlstd{,} \hlkwc{delta} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)}
+                            \hlstd{,} \hlstr{"norm"}
+                            \hlstd{,} \hlkwd{list}\hlstd{(}
+                              \hlkwc{mean} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{mean}\hlstd{(logretorno[logest2} \hlopt{==} \hlnum{0}\hlstd{])}
+                                       \hlstd{,} \hlkwd{mean}\hlstd{(logretorno[logest2} \hlopt{==} \hlnum{1}\hlstd{]))}
+                              \hlstd{,} \hlkwc{sd} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{sd}\hlstd{(logretorno[logest2} \hlopt{==} \hlnum{0}\hlstd{])}
+                                       \hlstd{,} \hlkwd{sd}\hlstd{(logretorno[logest2} \hlopt{==} \hlnum{1}\hlstd{]))))}
+                      \hlstd{,} \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{prt} \hlstd{=} \hlnum{FALSE}
+                                       \hlstd{,} \hlkwc{maxiter} \hlstd{=} \hlnum{500}
+                                       \hlstd{,} \hlkwc{tol} \hlstd{=} \hlnum{1e-05}
+                                       \hlstd{,} \hlkwc{posdiff} \hlstd{=} \hlnum{TRUE}
+                                       \hlstd{,} \hlkwc{converge} \hlstd{=} \hlkwd{expression}\hlstd{(diff} \hlopt{<} \hlstd{tol)))}
+
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Antes de sair tirando conclusões verificamos a qualidade do ajuste na Figura
+\ref{fig:r2}:
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{par}\hlstd{(}\hlkwc{mfrow} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{2}\hlstd{)) ;} \hlkwd{plot}\hlstd{(}\hlkwd{resid}\hlstd{(model_e2)}
+                            \hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{4.25}\hlstd{,} \hlnum{4.25}\hlstd{)}
+                            \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"Pseudo-resíduos"}
+                            \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Dias"}
+                            \hlstd{,} \hlkwc{las} \hlstd{=} \hlnum{1}
+                            \hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"(a)"}\hlstd{) ;} \hlkwd{grid}\hlstd{(}\hlkwc{col} \hlstd{=} \hlnum{1}\hlstd{) ;} \hlkwd{abline}\hlstd{(}
+                              \hlkwc{h} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlopt{-}\hlnum{1.96}\hlstd{,} \hlnum{1.96}\hlstd{,} \hlopt{-}\hlnum{2.58}\hlstd{,} \hlnum{2.58}\hlstd{)}
+                              \hlstd{,} \hlkwc{lty} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{4}\hlstd{,} \hlnum{4}\hlstd{))}
+\hlkwd{library}\hlstd{(car)}
+
+\hlkwd{qqPlot}\hlstd{(}\hlkwd{residuals}\hlstd{(model_e2)}
+       \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Quantis teóricos"}
+       \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"Pseudo-resíduos"}
+       \hlstd{,} \hlkwc{las} \hlstd{=} \hlnum{1}
+       \hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"(b)"}\hlstd{) ;} \hlkwd{layout}\hlstd{(}\hlnum{1}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/r2-1} 
+
+}
+
+\caption[Análise gráfica dos (pseudo-) resíduos]{Análise gráfica dos (pseudo-) resíduos. (a): resíduos segundo a ordem das observações com acéscimo de linhas em zero, 1.96 (mais e menos) e 2.58 (mais e menos), seguindo a 'regra' dos três desvios padrão; (b): envelope simulado para os resíduos}\label{fig:r2}
+\end{figure}
+
+
+\end{knitrout}
+
+Sem grandes problemas, não rejeitamos a presença de um comportamento aleatório
+e a normalidade dos pseudo-resíduos. \\
+
+Abaixo observa-se a matriz de probabilidades de transição estimada
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{model_e2}\hlopt{$}\hlstd{Pi}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+          [,1]      [,2]
+[1,] 0.7104082 0.2895918
+[2,] 0.2242944 0.7757056
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+As probabilidades estimadas diferem bastante das utilizadas como chutes 
+iniciais. \\
+
+Estima-se maiores probabilidades de permanência, com destaque para o segundo
+estado (compra), que apresenta uma menor probabilidade de transição, i.e.,
+em dias consecutivos é mais próvavel que a tomada de decisão seja a mesma,
+e se for pra ela mudar, é mais próvavel que ela mude pra tomada de decição
+venda \(\rightarrow\) compra. \\
+
+Para o estado venda foi atribuído como chute inicial uma média de
+\(\ensuremath{-0.00348}\) e um desvio padrão de
+\(0.00346\), e foi estimada uma média
+de \(\ensuremath{-5.6\times 10^{-4}}\) e um desvio padrão de
+\(0.00663\). \\
+
+Para o estado compra foi atribuído como chute inicial uma média de
+\(0.00324\) e um desvio padrão de
+\(0.00335\), e foi estimada uma média
+de \(\ensuremath{1.2\times 10^{-4}}\) e um desvio padrão de
+\(0.00254\). \\
+
+Uma vez que o modelo foi escolhido é possível fazer a predição dos estados da
+Cadeia de Markov. \\
+
+Observa-se com a Figura \ref{fig:pred2} que para retornos próximos de zero a
+Cadeia está associando a tomada de decisão compra, e para valores mais 
+distantes, venda. Contudo, pela lógica, para a tomada de decisão compra se deve
+ter log-retornos maiores que zero, e para a tomada de decisão venda,
+log-retornos menores que zero.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{xyplot}\hlstd{(}
+  \hlstd{logretorno} \hlopt{~} \hlnum{1}\hlopt{:}\hlkwd{length}\hlstd{(logretorno)} \hlopt{|} \hlkwd{factor}\hlstd{(}
+    \hlkwd{Viterbi}\hlstd{(model_e2)}
+    \hlstd{,} \hlkwc{labels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Vendo dólar"}\hlstd{,} \hlstr{"Compro dólar"}\hlstd{))}
+  \hlstd{,} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"p"}\hlstd{,} \hlstr{"g"}\hlstd{)}
+  \hlstd{,} \hlkwc{col} \hlstd{=} \hlnum{1}
+  \hlstd{,} \hlkwc{strip} \hlstd{=} \hlkwd{strip.custom}\hlstd{(}\hlkwc{bg} \hlstd{=} \hlstr{"white"}\hlstd{)}
+  \hlstd{,} \hlkwc{scales} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{alternating} \hlstd{=} \hlnum{1}\hlstd{)}
+  \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Dias"}
+  \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"log-retorno"}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/pred2-1} 
+
+}
+
+\caption[Predição dos dois estados da Cadeia de Markov]{Predição dos dois estados da Cadeia de Markov}\label{fig:pred2}
+\end{figure}
+
+
+\end{knitrout}
+
+Diferentes chutes iniciais para a matriz de probabilidades de transição foram
+utilizados, entretanto as probabilidades estimadas diferiram muito pouco,
+levando aos mesmos resultados de predição. \\
+
+Uma alternativa é aumentar o número de estados da Cadeia de Markov oculta.
+
+\subsection*{Modelo de três estados}
+\addcontentsline{toc}{subsection}{Modelo de três estados}
+
+\horrule{.5pt} \\
+
+O novo estado é a tomada de decisão espera, i.e., não mexer na carteira de 
+Euros.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{logest3} \hlkwb{<-} \hlkwd{ifelse}\hlstd{(}
+  \hlstd{logretorno} \hlopt{>= -}\hlnum{.0025} \hlopt{&} \hlstd{logretorno} \hlopt{<=} \hlnum{.0025}\hlstd{,} \hlnum{0}\hlstd{,} \hlkwd{ifelse}\hlstd{(}
+    \hlstd{logretorno} \hlopt{< -}\hlnum{.0025}\hlstd{,} \hlopt{-}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{))}
+
+\hlkwd{table}\hlstd{(logest3)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+logest3
+ -1   0   1 
+247 534 227 
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Foi usado como delimitadores pra esse novo estado log-retornos no intervalo
+\(\pm 0.0025\). \\
+
+Observa-se que dos 1008 log-retornos, 534 (53\%) se encaixam nesse estado
+(0: espera). Com um número bem equilibrado acima e abaixo, estados venda (-1)
+e compra (1), respectivamente. \\
+
+Com base no aprendizado obtido com o Modelo Oculto de Markov de dois estados,
+foi atribuído como chute inicial iguais probabilidades de transição para os
+estados.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{model_e3} \hlkwb{<-} \hlkwd{BaumWelch}\hlstd{(}\hlkwd{dthmm}\hlstd{(logretorno}
+                            \hlstd{,} \hlkwc{Pi} \hlstd{=} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{1}\hlopt{/}\hlnum{3}\hlstd{,} \hlnum{9}\hlstd{),} \hlkwc{byrow} \hlstd{=} \hlnum{TRUE}\hlstd{,} \hlkwc{nrow} \hlstd{=} \hlnum{3}\hlstd{)}
+                            \hlstd{,} \hlkwc{delta} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{1}\hlstd{)}
+                            \hlstd{,} \hlstr{"norm"}
+                            \hlstd{,} \hlkwd{list}\hlstd{(}
+                              \hlkwc{mean} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{mean}\hlstd{(logretorno[logest3} \hlopt{==} \hlnum{0}\hlstd{])}
+                                       \hlstd{,} \hlkwd{mean}\hlstd{(logretorno[logest3} \hlopt{== -}\hlnum{1}\hlstd{])}
+                                       \hlstd{,} \hlkwd{mean}\hlstd{(logretorno[logest3} \hlopt{==} \hlnum{1}\hlstd{]))}
+                              \hlstd{,} \hlkwc{sd} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{sd}\hlstd{(logretorno[logest3} \hlopt{==} \hlnum{0}\hlstd{])}
+                                       \hlstd{,} \hlkwd{sd}\hlstd{(logretorno[logest3} \hlopt{== -}\hlnum{1}\hlstd{])}
+                                       \hlstd{,} \hlkwd{sd}\hlstd{(logretorno[logest3} \hlopt{==} \hlnum{1}\hlstd{]))))}
+                      \hlstd{,} \hlkwc{control} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{prt} \hlstd{=} \hlnum{FALSE}
+                                       \hlstd{,} \hlkwc{maxiter} \hlstd{=} \hlnum{500}
+                                       \hlstd{,} \hlkwc{tol} \hlstd{=} \hlnum{1e-05}
+                                       \hlstd{,} \hlkwc{posdiff} \hlstd{=} \hlnum{TRUE}
+                                       \hlstd{,} \hlkwc{converge} \hlstd{=} \hlkwd{expression}\hlstd{(diff} \hlopt{<} \hlstd{tol)))}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Com a Figura \ref{fig:r3} observa-se um ajuste satisfatório do modelo e em
+seguida a matriz de probabilidades de transição estimada.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{par}\hlstd{(}\hlkwc{mfrow} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{2}\hlstd{)) ;} \hlkwd{plot}\hlstd{(}\hlkwd{resid}\hlstd{(model_e3)}
+                            \hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlopt{-}\hlnum{4.5}\hlstd{,} \hlnum{4.5}\hlstd{)}
+                            \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"Pseudo-resíduos"}
+                            \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Dias"}
+                            \hlstd{,} \hlkwc{las} \hlstd{=} \hlnum{1}
+                            \hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"(a)"}\hlstd{) ;} \hlkwd{grid}\hlstd{(}\hlkwc{col} \hlstd{=} \hlnum{1}\hlstd{) ;} \hlkwd{abline}\hlstd{(}
+                              \hlkwc{h} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlopt{-}\hlnum{1.96}\hlstd{,} \hlnum{1.96}\hlstd{,} \hlopt{-}\hlnum{2.58}\hlstd{,} \hlnum{2.58}\hlstd{)}
+                              \hlstd{,} \hlkwc{lty} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{2}\hlstd{,} \hlnum{4}\hlstd{,} \hlnum{4}\hlstd{))}
+\hlkwd{qqPlot}\hlstd{(}\hlkwd{residuals}\hlstd{(model_e3)}
+       \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Quantis teóricos"}
+       \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"Pseudo-resíduos"}
+       \hlstd{,} \hlkwc{las} \hlstd{=} \hlnum{1}
+       \hlstd{,} \hlkwc{main} \hlstd{=} \hlstr{"(b)"}\hlstd{) ;} \hlkwd{layout}\hlstd{(}\hlnum{1}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/r3-1} 
+
+}
+
+\caption[Análise gráfica dos (pseudo-) resíduos]{Análise gráfica dos (pseudo-) resíduos. (a): resíduos segundo a ordem das observações com acéscimo de linhas em zero, 1.96 (mais e menos) e 2.58 (mais e menos), seguindo a 'regra' dos três desvios padrão; (b): envelope simulado para os resíduos}\label{fig:r3}
+\end{figure}
+
+
+\end{knitrout}
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlstd{model_e3}\hlopt{$}\hlstd{Pi}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\begin{verbatim}
+          [,1]       [,2]        [,3]
+[1,] 0.5643763 0.01662133 0.419002383
+[2,] 0.2861313 0.13290712 0.580961608
+[3,] 0.3562025 0.63873048 0.005067058
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+A maior probabilidade de permanência é estimada para o primeiro estado, espera.
+A partir desse estado é mais provável transitar para o 3, compra (probabilidade
+0.42). \\
+
+O estado compra é o que apresenta a menor probabilidade de permanência, tendo
+64\% de chance de transitar para o estado venda. \\
+
+Do estado venda a maior probabilidade (0.58) é de transitar para o estado
+compra. \\
+
+Para o estado espera foi atribuído como chute inicial uma média de
+\(0\) e um desvio padrão de
+\(0.00125\), e foi estimada uma média
+de \(\ensuremath{10^{-4}}\) e um desvio padrão de
+\(0.00182\). \\
+
+Para o estado venda foi atribuído como chute inicial uma média de
+\(\ensuremath{-0.00611}\) e um desvio padrão de
+\(0.00332\), e foi estimada uma média
+de \(\ensuremath{-0.00251}\) e um desvio padrão de
+\(0.00588\). \\
+
+Para o estado compra foi atribuído como chute inicial uma média de
+\(0.00585\) e um desvio padrão de
+\(0.00335\), e foi estimada uma média
+de \(0.00149\) e um desvio padrão de
+\(0.00572\). \\
+
+Uma vez que o modelo foi escolhido é possível fazer a predição dos estados da
+Cadeia de Markov.
+
+\begin{knitrout}\small
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# <code r> ================================================================== #}
+\hlkwd{xyplot}\hlstd{(}
+  \hlstd{logretorno} \hlopt{~} \hlnum{1}\hlopt{:}\hlkwd{length}\hlstd{(logretorno)} \hlopt{|} \hlkwd{factor}\hlstd{(}
+    \hlkwd{Viterbi}\hlstd{(model_e3)}
+    \hlstd{,} \hlkwc{labels} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"Espero"}\hlstd{,} \hlstr{"Vendo dólar"}\hlstd{,} \hlstr{"Compro dólar"}\hlstd{))}
+  \hlstd{,} \hlkwc{type} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"p"}\hlstd{,} \hlstr{"g"}\hlstd{)}
+  \hlstd{,} \hlkwc{col} \hlstd{=} \hlnum{1}
+  \hlstd{,} \hlkwc{strip} \hlstd{=} \hlkwd{strip.custom}\hlstd{(}\hlkwc{bg} \hlstd{=} \hlstr{"white"}\hlstd{)}
+  \hlstd{,} \hlkwc{scales} \hlstd{=} \hlkwd{list}\hlstd{(}\hlkwc{alternating} \hlstd{=} \hlnum{1}\hlstd{)}
+  \hlstd{,} \hlkwc{xlab} \hlstd{=} \hlstr{"Dias"}
+  \hlstd{,} \hlkwc{ylab} \hlstd{=} \hlstr{"log retorno"}\hlstd{)}
+\hlcom{# </code r> ================================================================= #}
+\end{alltt}
+\end{kframe}\begin{figure}[H]
+
+{\centering \includegraphics[width=\maxwidth]{iBagens/pred3-1} 
+
+}
+
+\caption[Predição dos três estados da Cadeia de Markov]{Predição dos três estados da Cadeia de Markov}\label{fig:pred3}
+\end{figure}
+
+
+\end{knitrout}
+
+Com a Figura \ref{fig:pred3} se observa uma maior coerência de resultados,
+se comparada com a Figura \ref{fig:pred2}.
+
+Aqui, para log-retornos muito próximos de zero a tomada de decisão é esperar
+(ok, como foi imaginado). \\
+
+O ideal seria apenas log-retornos positivos para a tomada de decisão compra,
+e log-retornos negativos pra tomada de decisão venda, contudo, observa-se um
+maior número de log-retornos negativos e menores para o estado venda, e um
+maior número de log-retornos positivos e grandes para o estado compra. \\
+
+Esses resultados não são excelentes, mas são bons e plausíveis. Talvez esse 
+seja o melhor possível que a abordagem de Modelos Ocultos de Markov pode obter
+para essa série temporal. \\
+
+Diferentes chutes iniciais para a matriz de probabilidades de transição foram
+utilizados, entretanto as probabilidades estimadas diferiram muito pouco,
+levando aos mesmos resultados de predição.
+
+\vspace{\fill}
+\horrule{1pt} \\
+
+\end{document}
