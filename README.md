@@ -1,14 +1,14 @@
-**ce064 - Markovian Models**
+**ce064 - Markovian models**
 
 ***
 
-Repository with the developed activities for discipline ce064
+Repository with the developed activities for the course ce064
 
 ***
 
 * University: [Federal University of Paraná (UFPR)](http://www.ufpr.br/portalufpr/)
 * Department: Statistics
-* Course: Statistics
+* Course: B.S. in Statistics
 * Period: 1o half of 2016
 * Course page: [ce064](http://people.ufpr.br/~lucambio/CE064/1S2016/CE064.html)
 * Professor: [Fernando Lucambio Pérez](http://people.ufpr.br/~lucambio/)
@@ -19,6 +19,6 @@ Repository with the developed activities for discipline ce064
 
 *Activities:*
 
-+ [List 1](http://mynameislaure.github.io/ce064mm-list_1/master.pdf)
++ [Homework 1](http://mynameislaure.github.io/markov/hw1/master.pdf)
 
-+ [List 2](http://mynameislaure.github.io/ce064mm-list_2/master.pdf)
++ [Homework 2](http://mynameislaure.github.io/markov/hw2/master.pdf)
